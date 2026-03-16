@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student E-Portfolio System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body class="light">
+
+<div id="sparkle-container"></div>
+
+<!-- AUTH THEME TOGGLE (visible only on login/register) -->
+<button id="authThemeBtn" class="auth-theme-btn" onclick="toggleTheme()" title="Toggle Theme">
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<!-- ===================== LOGIN ===================== -->
+<section id="loginSection" class="auth-card">
+  <div class="auth-brand">✦ E-Portfolio</div>
+  <h2>Welcome back</h2>
+  <p class="auth-sub">Sign in to your portfolio</p>
+
+  <div class="field-group">
+    <label>Email</label>
+    <input id="loginEmail" type="email" placeholder="you@email.com">
+  </div>
+
+  <div class="field-group">
+    <label>Password</label>
+    <div class="password-wrap">
+      <input id="loginPassword" type="password" placeholder="••••••••">
+      <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)">
+        <svg class="eye-icon" viewBox="0 0 24 24">
+          <path class="eye-outline" d="M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7z"/>
+          <circle class="eye-pupil" cx="12" cy="12" r="3"/>
+          <line class="eye-slash" x1="4" y1="4" x2="20" y2="20"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="login()">Sign In</button>
+  <p class="auth-link">Don't have an account? <a onclick="showRegister()">Register</a></p>
+</section>
+
+<!-- ===================== REGISTER ===================== -->
+<section id="registerSection" class="auth-card hidden">
+  <div class="auth-brand">✦ E-Portfolio</div>
+  <h2>Create account</h2>
+  <p class="auth-sub">Join and build your portfolio</p>
+
+  <div class="field-group">
+    <label>Username</label>
+    <input id="regUsername" placeholder="yourname">
+  </div>
+  <div class="field-group">
+    <label>Full Name</label>
+    <input id="regName" placeholder="Your Full Name">
+  </div>
+  <div class="field-group">
+    <label>Email</label>
+    <input id="regEmail" type="email" placeholder="you@email.com">
+  </div>
+
+  <div class="field-group">
+    <label>Password</label>
+    <div class="password-wrap">
+      <input id="regPassword" type="password" placeholder="••••••••" minlength="8" oninput="updatePasswordHint(this.value)">
+      <button type="button" class="toggle-password" onclick="togglePassword('regPassword', this)">
+        <svg class="eye-icon" viewBox="0 0 24 24">
+          <path class="eye-outline" d="M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7z"/>
+          <circle class="eye-pupil" cx="12" cy="12" r="3"/>
+          <line class="eye-slash" x1="4" y1="4" x2="20" y2="20"/>
+        </svg>
+      </button>
+    </div>
+    <p id="passwordHint" class="password-hint">At least 8 characters</p>
+  </div>
+
+  <div class="field-group">
+    <label>Confirm Password</label>
+    <div class="password-wrap">
+      <input id="regConfirmPassword" type="password" placeholder="••••••••" minlength="8">
+      <button type="button" class="toggle-password" onclick="togglePassword('regConfirmPassword', this)">
+        <svg class="eye-icon" viewBox="0 0 24 24">
+          <path class="eye-outline" d="M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7z"/>
+          <circle class="eye-pupil" cx="12" cy="12" r="3"/>
+          <line class="eye-slash" x1="4" y1="4" x2="20" y2="20"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="register()">Create Account</button>
+  <p class="auth-link">Already have an account? <a onclick="showLogin()">Sign In</a></p>
+</section>
+
+<!-- ===================== OVERVIEW / PORTFOLIO ===================== -->
+<section id="overviewSection" class="hidden">
+
+  <!-- Top navbar -->
+  <nav class="pf-topbar">
+    <div class="pf-topbar-logo">✦</div>
+    <div class="pf-topbar-nav">
+      <button class="pf-topbtn active" onclick="showOverviewTab('overviewIntroSection', this)" title="Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </button>
+      <button class="pf-topbtn" onclick="showOverviewTab('overviewSkillsSection', this)" title="Skills">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Skills</span>
+      </button>
+      <button class="pf-topbtn" onclick="showOverviewTab('overviewCertsSection', this)" title="Certs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        <span>Certs</span>
+      </button>
+      <button class="pf-topbtn" onclick="showOverviewTab('overviewSocialSection', this)" title="Social">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Social</span>
+      </button>
+    </div>
+    <div class="pf-topbar-actions">
+  <button class="pf-topbtn" onclick="copyShareLink()" title="Share Portfolio" id="shareBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+    <span>Share</span>
+  </button>
+  <button class="pf-topbtn" onclick="showDashboard()" title="Edit Portfolio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+    <span>Edit</span>
+  </button>
+  <button class="pf-topbtn" onclick="openLogoutModal()" title="Sign Out">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    <span>Sign Out</span>
+  </button>
+  <button id="navThemeBtn" class="pf-topbtn" onclick="toggleTheme()" title="Toggle Theme">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <span>Theme</span>
+  </button>
+</div>
+  </nav>
+
+  <!-- Two-column layout -->
+  <div class="pf-layout">
+
+    <!-- LEFT: sticky profile sidebar -->
+    <div class="pf-profile-sidebar">
+      <div class="pf-avatar-wrap">
+        <img id="overviewPic" src="/default-avatar.png" alt="Profile">
+        <div class="pf-avatar-ring"></div>
+      </div>
+
+      <div class="pf-hero-text">
+        <p class="pf-handle" id="overviewUsername">@username</p>
+        <h1 id="overviewName">Your Name</h1>
+        <div class="pf-hero-divider"></div>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="pf-sidebar-stats">
+        <div class="pf-sidebar-stat">
+          <div class="pf-sidebar-stat-num" id="overviewStatSkills">—</div>
+          <div class="pf-sidebar-stat-label">Skills</div>
+        </div>
+        <div class="pf-sidebar-stat">
+          <div class="pf-sidebar-stat-num" id="overviewStatCerts">—</div>
+          <div class="pf-sidebar-stat-label">Certs</div>
+        </div>
+        <div class="pf-sidebar-stat">
+          <div class="pf-sidebar-stat-num" id="overviewStatSocials">—</div>
+          <div class="pf-sidebar-stat-label">Links</div>
+        </div>
+      </div>
+
+      <div class="pf-sidebar-quote">
+        Building the future, one skill at a time.
+      </div>
+    </div>
+    <!-- END sidebar -->
+
+    <!-- RIGHT: content area -->
+    <div class="pf-content-area">
+
+      <div class="pf-section active" id="overviewIntroSection">
+        <div class="pf-section-label">INTRODUCTION</div>
+        <div class="pf-intro-box" id="overviewIntro">
+          <p class="pf-placeholder">No introduction added yet.</p>
+        </div>
+      </div>
+
+      <div class="pf-section" id="overviewSkillsSection">
+        <div class="pf-section-label">Skills</div>
+        <div class="pf-skills-wrap" id="overviewSkills">
+          <p class="pf-placeholder">No skills added yet.</p>
+        </div>
+      </div>
+
+      <div class="pf-section" id="overviewCertsSection">
+        <div class="pf-section-label">Certificates</div>
+        <div class="pf-certs-grid" id="overviewCerts">
+          <p class="pf-placeholder">No certificates added yet.</p>
+        </div>
+      </div>
+
+      <div class="pf-section" id="overviewSocialSection">
+        <div class="pf-section-label">Socials</div>
+        <div class="pf-socials-wrap" id="overviewSocials">
+          <p class="pf-placeholder">No social links added yet.</p>
+        </div>
+      </div>
+
+    </div>
+    <!-- END pf-content-area -->
+
+  </div>
+  <!-- END pf-layout -->
+
+</section>
+
+<!-- ===================== EDIT DASHBOARD ===================== -->
+<section id="dashboardSection" class="hidden">
+
+  <aside class="ed-sidebar">
+    <div class="ed-sidebar-logo">✦</div>
+
+    <nav class="ed-sidenav">
+      <button class="ed-navbtn active" onclick="showDashSection('introSec', this)" data-label="Intro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>About</span>
+      </button>
+      <button class="ed-navbtn" onclick="showDashSection('skillsSec', this)" data-label="Skills">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Skills</span>
+      </button>
+      <button class="ed-navbtn" onclick="showDashSection('certSec', this)" data-label="Certs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        <span>Certs</span>
+      </button>
+      <button class="ed-navbtn" onclick="showDashSection('socialSec', this)" data-label="Social">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Social</span>
+      </button>
+    </nav>
+
+    <div class="ed-sidebar-footer">
+      <button class="ed-view-btn" onclick="showOverview()" title="View Portfolio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="ed-footer-label">View Portfolio</span>
+      </button>
+      <button class="ed-logout-btn" onclick="openLogoutModal()" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span class="ed-footer-label">Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="ed-main">
+
+    <button id="dashThemeBtn" class="dash-theme-float" onclick="toggleTheme()" title="Toggle Theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+
+    <div class="ed-profile-strip">
+      <div class="ed-avatar-area">
+        <div class="ed-avatar-wrap">
+          <img id="previewPic" src="/default-avatar.png" alt="Profile">
+          <div class="ed-avatar-overlay" onclick="document.getElementById('profilePic').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </div>
+        <div class="ed-avatar-actions">
+          <button id="changePhotoBtn" class="ed-photo-btn">Update Photo</button>
+          <button id="deletePhotoBtn" class="ed-photo-btn ed-photo-del">Remove</button>
+        </div>
+        <input type="file" id="profilePic" hidden>
+      </div>
+
+      <div class="ed-profile-info">
+        <h2>Hi, I'm <span id="usernameDisplay" class="ed-name-highlight">—</span></h2>
+        <p id="welcomeMessage" class="ed-welcome-sub"></p>
+        <div class="ed-profile-stats">
+          <div class="ed-stat">
+            <div class="ed-stat-num" id="statSkills">0</div>
+            <div class="ed-stat-label">Skills</div>
+          </div>
+          <div class="ed-stat">
+            <div class="ed-stat-num" id="statCerts">0</div>
+            <div class="ed-stat-label">Certificates</div>
+          </div>
+          <div class="ed-stat">
+            <div class="ed-stat-num" id="statSocials">0</div>
+            <div class="ed-stat-label">Socials</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ed-panels">
+
+      <div id="introSec" class="ed-panel active">
+        <div class="ed-panel-header">
+          <h3>Your Introduction</h3>
+          <p class="ed-panel-sub">Write a short bio that represents you</p>
+        </div>
+        <div class="ed-panel-body">
+          <div class="ed-intro-layout">
+            <div class="ed-intro-left">
+              <textarea id="intro" placeholder="Tell the world who you are, what you do, and what drives you..." rows="6"></textarea>
+              <div class="ed-panel-actions">
+                <button class="btn-primary" onclick="saveIntro()">Save Introduction</button>
+              </div>
+            </div>
+            <div class="ed-intro-right">
+              <div id="introPreview" class="ed-preview-box" style="display:none;">
+                <div class="ed-preview-label">Preview</div>
+                <p class="intro-text"></p>
+              </div>
+              <div class="ed-preview-placeholder" id="introPreviewEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <p>Your preview will appear here after saving</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="skillsSec" class="ed-panel">
+        <div class="ed-panel-header">
+          <h3>Your Skills</h3>
+          <p class="ed-panel-sub">Add skills to showcase your expertise</p>
+        </div>
+        <div class="ed-panel-body">
+          <div class="ed-intro-layout">
+            <div class="ed-intro-left">
+              <div class="ed-input-row">
+                <input id="skill" placeholder="e.g. JavaScript, Photoshop, Leadership…">
+                <button class="btn-primary" onclick="addSkill()">Add</button>
+              </div>
+              <ul id="skillList" class="ed-skill-tags"></ul>
+            </div>
+            <div class="ed-intro-right">
+              <div id="skillsPreview" class="ed-preview-box" style="display:none;">
+                <div class="ed-preview-label">Preview</div>
+                <div id="skillsPreviewTags" class="pf-skills-wrap"></div>
+              </div>
+              <div class="ed-preview-placeholder" id="skillsPreviewEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <p>Your skills will appear here once added</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="certSec" class="ed-panel">
+        <div class="ed-panel-header">
+          <h3>Certificates</h3>
+          <p class="ed-panel-sub">Upload your achievements and certifications</p>
+        </div>
+        <div class="ed-panel-body">
+          <div class="ed-intro-layout">
+            <div class="ed-intro-left">
+              <div class="ed-cert-form">
+                <div class="field-group">
+                  <label>Certificate Title</label>
+                  <input id="certTitle" placeholder="e.g. AWS Cloud Practitioner">
+                </div>
+                <div class="field-group">
+                  <label>File (Image or PDF)</label>
+                  <label class="ed-file-drop" for="certFile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span id="certFileLabel">Click to choose a file</span>
+                    <input type="file" id="certFile" hidden onchange="updateFileLabel(this)">
+                  </label>
+                </div>
+                <button class="btn-primary" onclick="addCertificate()">Upload Certificate</button>
+              </div>
+            </div>
+            <div class="ed-intro-right">
+              <div id="certsPreview" class="ed-preview-box" style="display:none;">
+                <div class="ed-preview-label">Preview</div>
+                <div id="certsPreviewGrid" class="ed-certs-preview-grid"></div>
+              </div>
+              <div class="ed-preview-placeholder" id="certsPreviewEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                <p>Your certificates will appear here once uploaded</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="socialSec" class="ed-panel">
+        <div class="ed-panel-header">
+          <h3>Social Links</h3>
+          <p class="ed-panel-sub">Connect your social media profiles</p>
+        </div>
+        <div class="ed-panel-body">
+          <div class="ed-intro-layout">
+            <div class="ed-intro-left">
+              <div class="ed-social-form">
+                <div class="ed-social-inputs">
+                  <div class="field-group">
+                    <label>Platform</label>
+                    <input id="platform" placeholder="e.g. Instagram, GitHub…">
+                  </div>
+                  <div class="field-group">
+                    <label>Link</label>
+                    <input id="url" placeholder="https://...">
+                  </div>
+                  <button class="btn-primary ed-social-add-btn" onclick="addSocial()">Add</button>
+                </div>
+              </div>
+              <ul id="socialList" class="ed-social-list"></ul>
+            </div>
+            <div class="ed-intro-right">
+              <div id="socialsPreview" class="ed-preview-box" style="display:none;">
+                <div class="ed-preview-label">Preview</div>
+                <div id="socialsPreviewCards" class="pf-socials-wrap"></div>
+              </div>
+              <div class="ed-preview-placeholder" id="socialsPreviewEmpty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <p>Your social links will appear here once added</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end panels -->
+  </div><!-- end ed-main -->
+</section>
+
+<!-- PUBLIC PORTFOLIO -->
+<section id="portfolioSection" class="hidden">
+  <div id="portfolioContent"></div>
+  <button onclick="showLogin()">Back to Login</button>
+</section>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-icon">🚪</div>
+    <h3>Sign Out</h3>
+    <p>Are you sure you want to leave?</p>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeLogoutModal()">Stay</button>
+      <button class="btn-primary" onclick="confirmLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE PHOTO MODAL -->
+<div id="deletePhotoModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-icon">🗑️</div>
+    <h3>Remove Photo</h3>
+    <p>This will reset your profile picture to the default.</p>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeDeletePhotoModal()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeletePhoto()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="/script.js"></script>
+</body>
+</html>
