@@ -1,5 +1,4 @@
-/* -------------------- BASE URL (change this to your PC's IP) -------------------- */
-const BASE_URL = "http://192.168.1.3:3000"; // 🔁 Replace with your IP e.g. "http://192.168.1.5:3000"
+const BASE_URL = "https://student-e-portfolio-production.up.railway.app";
 
 /* -------------------- SECTION CONTROL -------------------- */
 const loginSection     = document.getElementById("loginSection");
