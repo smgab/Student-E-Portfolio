@@ -6,7 +6,7 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
-const path = require("path"); 
+const path = require("path");
 
 const app = express();
 
@@ -24,37 +24,54 @@ app.use(express.static("public"));
    MYSQL CONNECTION
 ======================= */
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME || "portfolio"
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+});
+
+/* =======================
+   SETUP DATABASE TABLES
+======================= */
+app.get("/setup-db", (req, res) => {
+  const queries = [
+    `CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(100) NOT NULL UNIQUE, fullname VARCHAR(150) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS user_profile_pics (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, profile_pic VARCHAR(255))`,
+    `CREATE TABLE IF NOT EXISTS user_introduction (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, introduction TEXT)`,
+    `CREATE TABLE IF NOT EXISTS skills (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, skill_name VARCHAR(100) NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS certificates (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, title VARCHAR(255) NOT NULL, file_path VARCHAR(255) NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS socials (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, platform VARCHAR(100) NOT NULL, url VARCHAR(255) NOT NULL)`
+  ];
+
+  let completed = 0;
+  queries.forEach(sql => {
+    db.query(sql, (err) => {
+      if (err) return res.send("Error: " + err.message);
+      completed++;
+      if (completed === queries.length) res.send("✅ All tables created!");
+    });
+  });
 });
 
 /* =======================
    MULTER CONFIG
 ======================= */
-
-// 🔹 Profile picture upload
 const storage = multer.diskStorage({
   destination: "public/uploads/",
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
-
 const upload = multer({ storage });
 
-
-// 🔹 Certificate upload
 const certStorage = multer.diskStorage({
   destination: "public/uploads/certificates/",
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   }
 });
-
 const certUpload = multer({ storage: certStorage });
-
 
 /* =======================
    REGISTER ROUTE
@@ -69,18 +86,15 @@ app.post("/register", async (req, res) => {
   if (!username || !fullname || !email || !password || !confirmPassword) {
     return res.status(400).json({ message: "Please fill in all fields" });
   }
-
   if (password.length < 8) {
     return res.status(400).json({ message: "Password must be at least 8 characters" });
   }
-
   if (password !== confirmPassword) {
     return res.status(400).json({ message: "Passwords do not match" });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
     db.query(
       "INSERT INTO users (username, fullname, email, password_hash) VALUES (?, ?, ?, ?)",
       [username, fullname, email, hashedPassword],
@@ -117,14 +131,12 @@ app.post("/login", (req, res) => {
         console.error(err);
         return res.status(500).json({ message: "Server error" });
       }
-
       if (results.length === 0) {
         return res.status(401).json({ message: "User not found" });
       }
 
       const user = results[0];
       const match = await bcrypt.compare(password, user.password_hash);
-
       if (!match) {
         return res.status(401).json({ message: "Incorrect password" });
       }
@@ -156,7 +168,7 @@ app.post("/upload-profile-pic", upload.single("profilePic"), (req, res) => {
      VALUES (?, ?)
      ON DUPLICATE KEY UPDATE profile_pic = VALUES(profile_pic)`,
     [userId, imagePath],
-    (err, result) => {
+    (err) => {
       if (err) {
         console.error("DB error updating profile pic:", err);
         return res.status(500).json({ message: "DB error" });
@@ -258,7 +270,7 @@ app.post("/add-certificate", certUpload.single("certificate"), (req, res) => {
 });
 
 /* =======================
-  SOCIALS
+   SOCIALS
 ======================= */
 app.post("/add-social", (req, res) => {
   const { userId, platform, url } = req.body;
@@ -406,22 +418,16 @@ app.get("/api/portfolio/:username", (req, res) => {
 
 /* =======================
    START SERVER
-   ✅ "0.0.0.0" allows access from other devices on the same WiFi
 ======================== */
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 db.connect(err => {
   if (err) {
     console.error("Database connection failed:", err);
     return;
   }
-
   console.log("MySQL Connected");
-
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Access from phone: http://192.168.1.3:${PORT}`);
-    const PORT = process.env.PORT || 3000;
-
+    console.log(`Server running on port ${PORT}`);
   });
 });
