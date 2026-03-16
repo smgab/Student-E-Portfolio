@@ -36,7 +36,7 @@ const db = mysql.createConnection({
 ======================= */
 app.get("/setup-db", (req, res) => {
   const queries = [
-    `CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(100) NOT NULL UNIQUE, fullname VARCHAR(150) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(100) NOT NULL UNIQUE, fullname VARCHAR(150) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS user_profile_pics (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, profile_pic VARCHAR(255))`,
     `CREATE TABLE IF NOT EXISTS user_introduction (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, introduction TEXT)`,
     `CREATE TABLE IF NOT EXISTS skills (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, skill_name VARCHAR(100) NOT NULL)`,
@@ -52,6 +52,36 @@ app.get("/setup-db", (req, res) => {
       if (completed === queries.length) res.send("✅ All tables created!");
     });
   });
+});
+
+/* =======================
+   RESET DATABASE TABLES
+======================= */
+app.get("/reset-db", (req, res) => {
+  const queries = [
+    `DROP TABLE IF EXISTS socials`,
+    `DROP TABLE IF EXISTS certificates`,
+    `DROP TABLE IF EXISTS skills`,
+    `DROP TABLE IF EXISTS user_introduction`,
+    `DROP TABLE IF EXISTS user_profile_pics`,
+    `DROP TABLE IF EXISTS users`,
+    `CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(100) NOT NULL UNIQUE, fullname VARCHAR(150) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE user_profile_pics (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, profile_pic VARCHAR(255))`,
+    `CREATE TABLE user_introduction (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, introduction TEXT)`,
+    `CREATE TABLE skills (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, skill_name VARCHAR(100) NOT NULL)`,
+    `CREATE TABLE certificates (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, title VARCHAR(255) NOT NULL, file_path VARCHAR(255) NOT NULL)`,
+    `CREATE TABLE socials (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, platform VARCHAR(100) NOT NULL, url VARCHAR(255) NOT NULL)`
+  ];
+
+  let i = 0;
+  const run = () => {
+    if (i >= queries.length) return res.send("✅ Database reset successfully!");
+    db.query(queries[i++], (err) => {
+      if (err) return res.send("Error: " + err.message);
+      run();
+    });
+  };
+  run();
 });
 
 /* =======================
