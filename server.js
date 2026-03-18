@@ -23,12 +23,15 @@ app.use(express.static("public"));
 /* =======================
    MYSQL CONNECTION
 ======================= */
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 /* =======================
@@ -451,12 +454,13 @@ app.get("/api/portfolio/:username", (req, res) => {
 ======================== */
 const PORT = process.env.PORT || 3000;
 
-db.connect(err => {
+db.getConnection((err, connection) => {
   if (err) {
     console.error("Database connection failed:", err);
     return;
   }
   console.log("MySQL Connected");
+  connection.release();
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
   });
